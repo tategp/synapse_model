@@ -5,9 +5,9 @@ graphics opengl_good
 frame_thickness 1
 
 dim 3
-boundaries 0 -50 50 r
-boundaries 1 -50 50 r
-boundaries 2 -50 50 r
+boundaries 0 -500 500 r
+boundaries 1 -500 500 r
+boundaries 2 -500 500 r
 
 time_start 0
 time_stop 100
@@ -16,9 +16,10 @@ time_step 1
 species DA AMPH
 
 start_surface bouton
-  panel sphere 0 0 0 20 50 50
-  thickness 1
+  panel sphere 0 0 0 100 10 20
   action all both reflect
+  polygon both edge
+  color both red
 end_surface
 
 start_compartment bouton2
@@ -31,7 +32,10 @@ start_surface vesicle
   action_rule DA(all) back reflect
   action_rule AMPH(all) both absorb
   thickness 1
-  panel sphere 0 0 0 5 50 50
+  panel sphere 0 0 0 5 10 10
+  polygon edge
+  color front blue
+  color back cyan
 end_surface
 
 start_compartment vesicle2
