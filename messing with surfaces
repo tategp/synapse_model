@@ -33,7 +33,7 @@ start_surface vesicle
   action_rule AMPH(all) both absorb
   thickness 1
   panel sphere 0 0 0 5 10 10
-  polygon edge
+  polygon both edge
   color front blue
   color back cyan
 end_surface
