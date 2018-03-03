@@ -5,15 +5,23 @@ graphics opengl_good
 frame_thickness 1
 
 dim 3
-boundaries 0 -500 500 r
-boundaries 1 -500 500 r
-boundaries 2 -500 500 r
+boundaries 0 -300 300 r
+boundaries 1 -300 300 r
+boundaries 2 -300 300 r
 
 time_start 0
-time_stop 100
-time_step 1
+time_stop 5000
+time_step 0.1
 
-species DA AMPH
+species A B C
+#A will go out of vesicle and not come in again
+#B will go in and out
+#C will stay in the vesicle
+display_size all 1
+color A blue
+color B pink
+color C green
+difc all 1
 
 start_surface bouton
   panel sphere 0 0 0 100 10 20
@@ -28,11 +36,12 @@ start_compartment bouton2
 end_compartment
 
 start_surface vesicle
-  action_rule DA(all) front transmit
-  action_rule DA(all) back reflect
-  action_rule AMPH(all) both absorb
+  action A(all) front reflect
+  action A(all) back transmit
+  action B(all) both absorb
+  action C(all) both reflect
   thickness 1
-  panel sphere 0 0 0 5 10 10
+  panel sphere 0 0 0 20 10 10
   polygon both edge
   color front blue
   color back cyan
@@ -43,4 +52,11 @@ start_compartment vesicle2
   point 0 0 0
 end_compartment
 
-end_file
+start_compartment bouton-vesicle
+  compartment equal bouton2
+  compartment andnot vesicle2
+end_compartment
+
+compartment_mol 100 A vesicle2
+compartment_mol 100 B vesicle2
+compartment_mol 100 C vesicle2
