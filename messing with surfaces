@@ -60,3 +60,5 @@ end_compartment
 compartment_mol 100 A vesicle2
 compartment_mol 100 B vesicle2
 compartment_mol 100 C vesicle2
+
+end_file
