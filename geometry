@@ -2,9 +2,23 @@
 
 # Dimensions
 dim 3
-boundaries 0 -50 230 r
-boundaries 1 -50 50 r
-boundaries 2 -50 50 r
+boundaries 0 -1000 1000 r
+boundaries 1 -1000 1000 r
+boundaries 2 -1000 1000 r
+
+# Just so the code runs...
+#####################
+species S E ES P
+difc S 3
+difc P 3
+color S(all) green
+color E(all) darkred
+color ES(all) orange
+color P(all) darkblue
+display_size all(all) 0.02
+display_size E(all) 0.03
+display_size ES(all) 0.03
+#####################
 
 # Time steps
 time_start 0
@@ -18,16 +32,21 @@ frame_thickness 0
 # Surface
 start_surface presynapse
   action all both reflect
-  color both black
+  color both red 1
   polygon both edge
-  panel hemi 0 0 20 500 0 0 1 20 10
-  #panel cyl 0 0 0 180 0 0 50 20 20
+  panel hemi 0 0 20 250 0 0 -1 20 10
+  panel disk 0 0 20 250 0 0 -1 20
+  panel cyl 0 0 265 0 0 365 50 20 10
+  panel disk 0 0 265 50 0 0 -1 20
 end_surface
+
 
 start_surface postsynapse
   action all both reflect
   color both black
   polygon both edge
-  panel hemi 0 0 0 500 0 0 -1 20 10
-  #panel cyl 0 0 0 180 0 0 50 20 20
+  panel hemi 0 0 0 250 0 0 1 20 10
+  panel disk 0 0 0 250 0 0 1 20
+  panel cyl 0 0 -245 0 0 -350 50 20 10
+  panel disk 0 0 -245 50 0 0 1 20
 end_surface
