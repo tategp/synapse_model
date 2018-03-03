@@ -1,0 +1,42 @@
+## Dopamine Model
+
+#Graphics
+graphics opengl_good
+frame_thickness 1
+
+dim 3
+boundaries 0 -50 50 r
+boundaries 1 -50 50 r
+boundaries 2 -50 50 r
+
+time_start 0
+time_stop 100
+time_step 1
+
+species DA AMPH
+
+start_surface bouton
+  panel sphere 0 0 0 20 50 50
+  thickness 1
+  action all both reflect
+end_surface
+
+start_compartment bouton2
+  surface bouton
+  point 0 0 0
+end_compartment
+
+start_surface vesicle
+  action_rule DA(all) front transmit
+  action_rule DA(all) back reflect
+  action_rule AMPH(all) both absorb
+  thickness 1
+  panel sphere 0 0 0 5 50 50
+end_surface
+
+start_compartment vesicle2
+  surface vesicle
+  point 0 0 0
+end_compartment
+
+end_file
