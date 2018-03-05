@@ -1,0 +1,145 @@
+#Smoldyn code for the geometry of the synapse
+
+# Dimensions
+dim 3
+boundaries 0 -300 700 r
+boundaries 1 -300 700 r
+boundaries 2 -300 700 r
+
+# Just so the code runs...
+#######Add recptors
+species DA AMPH D1 DAT D1DA DAO DAI
+difc DA 3
+difc DAO 3
+difc DAI 3
+difc AMPH 3
+difc D1 0
+difc D1DA 0
+difc DAT 0
+color DA(all) green
+color AMPH(all) orange
+color D1(all) rose
+color D1DA(all) gold
+color DAT(all) cyan
+color DAO(all) azure
+color DAI(all) sky
+
+display_size all(all) 0.02
+display_size DA(all) 0.1
+display_size AMPH(all) 0.03
+display_size D1(all) 0.5
+display_size D1DA(all) 0.5
+display_size DAT(all) 0.5
+display_size DAO(all) 0.5
+display_size DAI(all) 0.5
+
+
+
+# Time steps
+time_start 0
+time_stop 100
+time_step 0.01
+
+# Graphics
+graphics opengl_good
+frame_thickness 0
+
+# Surface
+start_surface presynapse
+  action all both reflect
+  color both red 1
+  polygon both edge
+  panel disk 0 0 20 100 0 0 -1 20
+  panel cyl 0 0 20 0 0 170 100 20 5
+  panel disk 0 0 170 100 0 0 1 20
+end_surface
+
+start_surface cleft
+  action all both reflect
+  color both purple 1
+  polygon both edge
+  panel disk 0 0 0 100 0 0 -1 20
+  panel cyl 0 0 0 0 0 20 100 20 2
+  panel disk 0 0 20 100 0 0 1 20
+end_surface
+
+#######Adding receptors###############
+surface_mol 276 D1(front) cleft disk disk0
+surface_mol 291 DAT(front) cleft disk disk1
+
+start_surface postsynapse
+  action all both reflect
+  color both black
+  polygon both edge
+  panel disk 0 0 -170 100 0 0 -1 20
+  panel cyl 0 0 -170 0 0 0 100 20 5
+  panel disk 0 0 0 100 0 0 1 20
+end_surface
+
+start_surface vesicle_release
+  action all both reflect
+  color both green 1
+  polygon both edge
+  panel sph 0 0 50 25 10 10
+end_surface
+
+start_surface vesicle_uptake
+  action DA both absorb
+  color both orange 1
+  polygon both edge
+  panel sph 0 0 140 25 10 10
+end_surface
+
+start_surface jump
+  panel disk 0 0 400 25 0 1 0 20
+  panel disk 0 0 369 25 0 0 1 20
+  panel disk 0 0 400 25 1 0 0 20
+  panel disk 0 0 400 25 0 0 1 20
+  action both all j
+  jump disk0 front -> disk1 front
+  jump disk0 back -> disk1 front
+  jump disk2 front -> disk1 front
+  jump disk2 back -> disk1 front
+  jump disk3 front -> disk1 front
+  jump disk3 back -> disk1 front
+  thickness 1
+  color front lightyellow
+  color back orange
+end_surface
+
+#Define compartments
+
+start_compartment vesicle_release
+  surface vesicle_release
+  point 0 0 50
+end_compartment
+
+start_compartment jump
+  surface jump
+  point 0 0 400
+end_compartment
+	
+#Starting molecules
+
+compartment_mol 3200 DA vesicle_release
+
+#Commands during sim
+#Note: 3200 starting mols and t=10 of jump means 2500 DA released
+
+cmd i 30 41 10 translatecmpt jump 1 0 0 -350 
+
+cmd b pause
+
+###########reactions########
+reaction D1fwd D1(front) + DA(all) -> D1DA(front) 1
+reaction D1bck D1DA(front) -> D1(front) + DAO(fsoln) 1
+reaction D1bckI D1DA(back) -> D1(front) + DAI(bsoln) 1
+
+#Outputs
+
+#output_files output molcount.csv
+#output_format csv
+#cmd i 0 300 10 molcountincmpt vesicle_release molcount.csv
+
+
+end_file
