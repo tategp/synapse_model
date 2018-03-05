@@ -1,0 +1,117 @@
+#Smoldyn code for the geometry of the synapse
+
+# Dimensions
+dim 3
+boundaries 0 -1000 1000 r
+boundaries 1 -1000 1000 r
+boundaries 2 -1000 1000 r
+
+# Just so the code runs...
+#####################
+species DA AMPH
+difc DA 3
+difc AMPH 3
+color DA(all) green
+color AMPH(all) orange
+display_size all(all) 0.02
+display_size DA(all) 0.1
+display_size AMPH(all) 0.03
+#####################
+
+# Time steps
+time_start 0
+time_stop 100
+time_step 0.01
+
+# Graphics
+graphics opengl_good
+frame_thickness 0
+
+# Surface
+start_surface presynapse
+  action all both reflect
+  color both red 1
+  polygon both edge
+  panel disk 0 0 20 100 0 0 -1 20
+  panel cyl 0 0 20 0 0 170 100 20 5
+  panel disk 0 0 170 100 0 0 1 20
+end_surface
+
+start_surface cleft
+  action all both reflect
+  color both purple 1
+  polygon both edge
+  panel disk 0 0 0 100 0 0 -1 20
+  panel cyl 0 0 0 0 0 20 100 20 2
+  panel disk 0 0 20 100 0 0 1 20
+end_surface
+
+start_surface postsynapse
+  action all both reflect
+  color both black
+  polygon both edge
+  panel disk 0 0 -170 100 0 0 -1 20
+  panel cyl 0 0 -170 0 0 0 100 20 5
+  panel disk 0 0 0 100 0 0 1 20
+end_surface
+
+start_surface vesicle_release
+  action all both reflect
+  color both green 1
+  polygon both edge
+  panel sph 0 0 50 25 10 10
+end_surface
+
+start_surface vesicle_uptake
+  action DA both absorb
+  color both orange 1
+  polygon both edge
+  panel sph 0 0 140 25 10 10
+end_surface
+
+start_surface jump
+  panel disk 0 0 900 25 0 1 0 20
+  panel disk 0 0 869 25 0 0 1 20
+  panel disk 0 0 900 25 1 0 0 20
+  panel disk 0 0 900 25 0 0 1 20
+  action both all j
+  jump disk0 front -> disk1 front
+  jump disk0 back -> disk1 front
+  jump disk2 front -> disk1 front
+  jump disk2 back -> disk1 front
+  jump disk3 front -> disk1 front
+  jump disk3 back -> disk1 front
+  thickness 1
+  color front lightyellow
+  color back orange
+end_surface
+
+#Define compartments
+
+start_compartment vesicle_release
+  surface vesicle_release
+  point 0 0 50
+end_compartment
+
+start_compartment jump
+  surface jump
+  point 0 0 900
+end_compartment
+	
+#Starting molecules
+
+compartment_mol 3200 DA vesicle_release
+
+#Commands during sim
+#Note: 3200 starting mols and t=10 of jump means 2500 DA released
+
+cmd i 30 41 10 translatecmpt jump 1 0 0 -850 
+
+#Outputs
+
+output_files output molcount.csv
+output_format csv
+cmd i 0 300 10 molcountincmpt vesicle_release molcount.csv
+
+
+end_file
