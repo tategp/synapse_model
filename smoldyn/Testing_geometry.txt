@@ -1,0 +1,74 @@
+# Example smoldyn code for the geometry of the synapse
+
+# Dimensions
+dim 3
+boundaries 0 -1000 1000 r
+boundaries 1 -1000 1000 r
+boundaries 2 -1000 1000 r
+
+# Just so the code runs...
+#####################
+species S E ES P
+difc S 3
+difc P 3
+color S(all) green
+color E(all) darkred
+color ES(all) orange
+color P(all) darkblue
+display_size all(all) 0.02
+display_size E(all) 0.03
+display_size ES(all) 0.03
+#####################
+
+# Time steps
+time_start 0
+time_stop 10
+time_step 0.01
+
+# Graphics
+graphics opengl_good
+frame_thickness 0
+
+# Surface
+start_surface presynapse
+  action all both reflect
+  color both red 1
+  polygon both edge
+  panel disk 0 0 20 100 0 0 -1 20
+  panel cyl 0 0 20 0 0 170 100 20 5
+  panel disk 0 0 170 100 0 0 1 20
+end_surface
+
+start_surface cleft
+  action all both reflect
+  color both purple 1
+  polygon both edge
+  panel disk 0 0 0 100 0 0 -1 20
+  panel cyl 0 0 0 0 0 20 100 20 2
+  panel disk 0 0 20 100 0 0 1 20
+end_surface
+
+start_surface postsynapse
+  action all both reflect
+  color both black
+  polygon both edge
+  panel disk 0 0 -170 100 0 0 -1 20
+  panel cyl 0 0 -170 0 0 0 100 20 5
+  panel disk 0 0 0 100 0 0 1 20
+end_surface
+
+start_surface vesicle_release
+  action all both reflect
+  color both green 1
+  polygon both edge
+  panel sph 0 0 50 25 10 10
+end_surface
+
+start_surface vesicle_uptake
+  action all both reflect
+  color both orange 1
+  polygon both edge
+  panel sph 0 0 140 25 10 10
+end_surface
+
+end_file
