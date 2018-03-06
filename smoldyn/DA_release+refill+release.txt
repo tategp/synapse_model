@@ -1,82 +1,108 @@
 #Smoldyn code for the geometry of the synapse
-#nm and msec
+#nm and usec
 
-### Dimensions
+########## Dimensions ##########
 dim 3
 boundaries 0 -1000 1000 r
 boundaries 1 -1000 1000 r
 boundaries 2 -1000 1000 r
 
-### Species
-species DA AMPH
-difc DA 3
+########## Species ########## (DAO=DAextrasynaptic, DAI=DAintrabouton)
+
+species DA AMPH D1 DAT D1DA DATDA
+
+difc DA 240 #AV
 difc AMPH 3
+difc D1 0 #AV
+difc D1DA 0 #AV
+difc DAT 0 #AV
+difc DATDA 0 #AV
+
 color DA(all) green
 color AMPH(all) orange
+color D1(all) rose
+color D1DA(all) gold
+color DAT(all) cyan
+color DATDA(all) yellow
 
+display_size all(all) 0.02
 display_size DA(all) 0.1
-display_size AMPH(all) 0.1
+display_size AMPH(all) 0.03
+display_size D1(all) 0.5
+display_size D1DA(all) 0.5
+display_size DAT(all) 0.5
+display_size DATDA(all) 0.5
 
-### Time steps
+
+########## Time steps ##########
 time_start 0
-time_stop 500
-time_step 0.1
+time_stop 3000
+time_step 0.5
 
-### Graphics
+########## Graphics ##########
 graphics opengl_good
 frame_thickness 0
 
-### Surface
+########## Surface ##########
 start_surface presynapse
   action all both reflect
   color both red 1
   polygon both edge
-  panel disk 0 0 20 100 0 0 -1 20
-  panel cyl 0 0 20 0 0 170 100 20 5
-  panel disk 0 0 170 100 0 0 1 20
+  panel disk 0 20 0 100 0 -1 0 20
+  panel cyl 0 20 0 0 170 0 100 20 5
+  panel disk 0 170 0 100 0 1 0 20
 end_surface
 
 start_surface cleft
   action all both reflect
   color both purple 1
   polygon both edge
-  panel disk 0 0 0 100 0 0 -1 20
-  panel cyl 0 0 0 0 0 20 100 20 2
-  panel disk 0 0 20 100 0 0 1 20
+  panel disk 0 0 0 100 0 -1 0 20
+  panel cyl 0 0 0 0 20 0 100 20 2
+  panel disk 0 20 0 100 0 1 0 20
 end_surface
 
 start_surface postsynapse
   action all both reflect
   color both black
   polygon both edge
-  panel disk 0 0 -170 100 0 0 -1 20
-  panel cyl 0 0 -170 0 0 0 100 20 5
-  panel disk 0 0 0 100 0 0 1 20
+  panel disk 0 -170 0 100 0 -1 0 20
+  panel cyl 0 -170 0 0 0 0 100 20 5
+  panel disk 0 0 0 100 0 1 0 20
 end_surface
 
 start_surface vesicle_release
   action all both reflect
   color both green 1
   polygon both edge
-  panel sph 0 0 50 25 10 10
+  panel sph 0 50 0 25 10 10
 end_surface
 
-start_surface vesicle_uptake
-  action DA both absorb
+start_surface vesicle_uptake1
+  action DA front transmit
+  action DA back reflect
   color both orange 1
   polygon both edge
-  panel sph 0 0 140 25 10 10
+  panel sph -60 75 0 25 10 10
+end_surface
+
+start_surface vesicle_uptake2
+  action DA front transmit
+  action DA back reflect
+  color both orange 1
+  polygon both edge
+  panel sph 60 75 0 25 10 10
 end_surface
 
 start_surface jump
-  panel disk 0 0 869 25 0 0 1 20 #the cleft one
-  panel disk 0 0 900 25 0 1 0 20 #here and below in vesicle_release #1
-  panel disk 0 0 900 25 1 0 0 20 
-  panel disk 0 0 900 25 0 0 1 20 
-  panel disk 0 0 900 25 1 0 1 20 
-  panel disk 0 0 900 25 0 1 1 20
-  panel disk 0 0 900 25 1 1 0 20 
-  panel disk 0 0 900 25 1 1 1 20 
+  panel disk 0 869 0 25 0 1 0 20 #disk 0 is the cleft one
+  panel disk 0 900 0 25 0 1 0 20 #disk 1 and below are in vesicle_release
+  panel disk 0 900 0 25 1 0 0 20 
+  panel disk 0 900 0 25 0 0 1 20 
+  panel disk 0 900 0 25 1 0 1 20 
+  panel disk 0 900 0 25 0 1 1 20
+  panel disk 0 900 00 25 1 1 0 20 
+  panel disk 0 900 0 25 1 1 1 20 
   action both all j
   jump disk1 front -> disk0 front
   jump disk1 back -> disk0 front
@@ -97,11 +123,26 @@ start_surface jump
   color back orange
 end_surface
 
-###Define compartments
+########## Define compartments ##########
+
+start_compartment presynapse
+  surface presynapse
+  point 0 20 0
+end_compartment
 
 start_compartment vesicle_release
   surface vesicle_release
-  point 0 0 50
+  point 0 50 0
+end_compartment
+
+start_compartment vesicle_uptake1
+  surface vesicle_release
+  point -60 75 0
+end_compartment
+
+start_compartment vesicle_uptake2
+  surface vesicle_release
+  point 60 75 0
 end_compartment
 
 start_compartment cleft
@@ -111,39 +152,64 @@ end_compartment
 
 start_compartment jump
   surface jump
-  point 0 0 900
+  point 0 900 0
 end_compartment
 	
-#Starting molecules
+########## Starting molecules/receptors ##########
 
-compartment_mol 2800 DA vesicle_release
+surface_mol 276 D1(back) cleft disk disk0 #AV
+surface_mol 291 DAT(front) cleft disk disk1 #AV
 
-###Commands during sim
-#Note: 2800 starting mols and t=10 of jump means 2600 DA released aslong as has time to diffuse beforehand (20ms seems sufficient) 
+compartment_mol 2500 DA vesicle_release
 
-#DA release
-cmd @ 50 translatecmpt jump 1 0 0 -850
-cmd @ 80 translatecmpt jump 1 0 0 850
+########## Reactions ##########
 
-cmd @ 110 translatecmpt jump 1 0 0 -850  
-cmd @ 180 translatecmpt jump 1 0 0 850
+reaction D1fwd D1(back) + DA(all) -> D1DA(back) 1
+reaction D1bck D1DA(back) -> D1(back) + DA(fsoln) 0.5
+reaction DATfwd DAT(front) + DA(all) -> DATDA(front) 10
+reaction DATbck DATDA(front) -> DAT(front) + DA(fsoln) 7
 
-cmd @ 220 translatecmpt jump 1 0 0 -850  
-cmd @ 250 translatecmpt jump 1 0 0 850
+########## Commands during sim ##########
 
-#vesicle_release refil to 2800
-cmd @ 100 fixmolcountincmpt DA 2800 vesicle_release
-cmd @ 100 fixmolcountincmpt DA 100 cleft
+### DA release
+cmd @ 500 translatecmpt jump 1 0 -850 0
+cmd @ 600 translatecmpt jump 1 0 850 0
 
-cmd @ 200 fixmolcountincmpt DA 2800 vesicle_release
-cmd @ 200 fixmolcountincmpt DA 100 cleft
+cmd @ 1200 translatecmpt jump 1 0 -850 0
+cmd @ 1300 translatecmpt jump 1 0 850 0
+
+cmd @ 2200 translatecmpt jump 1 0 -850 0 
+cmd @ 2300 translatecmpt jump 1 0 850 0
+
+### vesicle_release refil to 2500
+cmd @ 1000 fixmolcountincmpt DA 2500 vesicle_release
+# cmd @ 1000 fixmolcountincmpt DA 100 cleft
+
+cmd @ 2000 fixmolcountincmpt DA 2500 vesicle_release
+# cmd @ 2000 fixmolcountincmpt DA 100 cleft
  
 
-### Outputs
+########## Outputs ##########
 
-output_files output molcount_vesicle.csv molcount_cleft.csv
+output_files output molcount_releasevesicle.csv molcount_cleft.csv molcount_presynapse.csv molcount_uptakevesicle1.csv molcount_uptakevesicle2.csv molcount_uptakevesicles.csv molcount.csv
+
 output_format csv
-cmd i 0 500 10 molcountincmpt vesicle_release molcount_vesicle.csv
-cmd i 0 500 10 molcountincmpt cleft molcount_cleft.csv
+
+cmd B molcountheader molcount.csv
+cmd B molcountheader molcount_presynapse.csv
+cmd B molcountheader molcount_releasevesicle.csv 
+cmd B molcountheader molcount_uptakevesicle1.csv 
+cmd B molcountheader molcount_uptakevesicle2.csv 
+cmd B molcountheader molcount_uptakevesicles.csv 
+cmd B molcountheader molcount_cleft.csv
+
+cmd i 0 3000 10 molcount molcount.csv 
+cmd i 0 3000 10 molcountincmpt presynapse molcount_presynapse.csv
+cmd i 0 3000 10 molcountincmpt vesicle_release molcount_releasevesicle.csv 
+cmd i 0 3000 10 molcountincmpt vesicle_uptake1 molcount_uptakevesicle1.csv 
+cmd i 0 3000 10 molcountincmpt vesicle_uptake2 molcount_uptakevesicle2.csv 
+cmd i 0 3000 10 molcountincmpts vesicle_uptake1 vesicle_uptake2 molcount_uptakevesicles.csv 
+cmd i 0 3000 10 molcountincmpt cleft molcount_cleft.csv
+
 
 end_file
