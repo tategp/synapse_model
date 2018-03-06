@@ -8,21 +8,25 @@ boundaries 2 -300 700 r
 
 # Just so the code runs...
 #######Add recptors
-species DA AMPH D1 DAT D1DA DAO DAI
-difc DA 3
+species DA AMPH D1 DAT D1DA DAO DATDA DAI
+
+difc DA 240 #AV
 difc DAO 3
-difc DAI 3
 difc AMPH 3
-difc D1 0
-difc D1DA 0
-difc DAT 0
+difc D1 0 #AV
+difc D1DA 0 #AV
+difc DAT 0 #AV
+difc DAI 3
+difc DATDA 0 #AV
+
 color DA(all) green
 color AMPH(all) orange
 color D1(all) rose
 color D1DA(all) gold
 color DAT(all) cyan
 color DAO(all) azure
-color DAI(all) sky
+color DATDA(all) yellow
+color DAI(all) brick
 
 display_size all(all) 0.02
 display_size DA(all) 0.1
@@ -31,14 +35,16 @@ display_size D1(all) 0.5
 display_size D1DA(all) 0.5
 display_size DAT(all) 0.5
 display_size DAO(all) 0.5
+display_size DATDA(all) 0.5
 display_size DAI(all) 0.5
+
 
 
 
 # Time steps
 time_start 0
 time_stop 100
-time_step 0.01
+time_step 0.1
 
 # Graphics
 graphics opengl_good
@@ -64,7 +70,7 @@ start_surface cleft
 end_surface
 
 #######Adding receptors###############
-surface_mol 276 D1(front) cleft disk disk0
+surface_mol 276 D1(back) cleft disk disk0
 surface_mol 291 DAT(front) cleft disk disk1
 
 start_surface postsynapse
@@ -131,9 +137,11 @@ cmd i 30 41 10 translatecmpt jump 1 0 0 -350
 cmd b pause
 
 ###########reactions########
-reaction D1fwd D1(front) + DA(all) -> D1DA(front) 1
-reaction D1bck D1DA(front) -> D1(front) + DAO(fsoln) 1
-reaction D1bckI D1DA(back) -> D1(front) + DAI(bsoln) 1
+reaction D1fwd D1(back) + DA(all) -> D1DA(back) 1
+reaction D1bck D1DA(back) -> D1(back) + DAO(fsoln) 0.5
+reaction DATfwd DAT(front) + DA(all) -> DATDA(front) 1
+reaction DATbck DATDA(front) -> DAT(front) + DAI(fsoln) 0.7
+
 
 #Outputs
 
