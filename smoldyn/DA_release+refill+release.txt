@@ -1,4 +1,5 @@
 #Smoldyn code for the geometry of the synapse
+#nm and msec
 
 ### Dimensions
 dim 3
@@ -12,14 +13,14 @@ difc DA 3
 difc AMPH 3
 color DA(all) green
 color AMPH(all) orange
-display_size all(all) 0.02
+
 display_size DA(all) 0.1
-display_size AMPH(all) 0.03
+display_size AMPH(all) 0.1
 
 ### Time steps
 time_start 0
-time_stop 60
-time_step 0.01
+time_stop 500
+time_step 0.1
 
 ### Graphics
 graphics opengl_good
@@ -68,17 +69,29 @@ start_surface vesicle_uptake
 end_surface
 
 start_surface jump
-  panel disk 0 0 900 25 0 1 0 20
-  panel disk 0 0 869 25 0 0 1 20
-  panel disk 0 0 900 25 1 0 0 20
-  panel disk 0 0 900 25 0 0 1 20
+  panel disk 0 0 869 25 0 0 1 20 #the cleft one
+  panel disk 0 0 900 25 0 1 0 20 #here and below in vesicle_release #1
+  panel disk 0 0 900 25 1 0 0 20 
+  panel disk 0 0 900 25 0 0 1 20 
+  panel disk 0 0 900 25 1 0 1 20 
+  panel disk 0 0 900 25 0 1 1 20
+  panel disk 0 0 900 25 1 1 0 20 
+  panel disk 0 0 900 25 1 1 1 20 
   action both all j
-  jump disk0 front -> disk1 front
-  jump disk0 back -> disk1 front
-  jump disk2 front -> disk1 front
-  jump disk2 back -> disk1 front
-  jump disk3 front -> disk1 front
-  jump disk3 back -> disk1 front
+  jump disk1 front -> disk0 front
+  jump disk1 back -> disk0 front
+  jump disk2 front -> disk0 front
+  jump disk2 back -> disk0 front
+  jump disk3 front -> disk0 front
+  jump disk3 back -> disk0 front
+  jump disk4 front -> disk0 front
+  jump disk4 back -> disk0 front
+  jump disk5 front -> disk0 front
+  jump disk5 back -> disk0 front
+  jump disk6 front -> disk0 front
+  jump disk6 back -> disk0 front
+  jump disk7 front -> disk0 front
+  jump disk7 back -> disk0 front
   thickness 1
   color front lightyellow
   color back orange
@@ -103,26 +116,34 @@ end_compartment
 	
 #Starting molecules
 
-compartment_mol 3200 DA vesicle_release
+compartment_mol 2800 DA vesicle_release
 
 ###Commands during sim
-#Note: 3200 starting mols and t=10 of jump means 2500 DA released
+#Note: 2800 starting mols and t=10 of jump means 2600 DA released aslong as has time to diffuse beforehand (20ms seems sufficient) 
 
 #DA release
-cmd @ 10 translatecmpt jump 1 0 0 -850
-cmd @ 20 translatecmpt jump 1 0 0 850
-cmd @ 40 translatecmpt jump 1 0 0 -850  
-cmd @ 50 translatecmpt jump 1 0 0 850
+cmd @ 50 translatecmpt jump 1 0 0 -850
+cmd @ 80 translatecmpt jump 1 0 0 850
 
-#vesicle_release refil to 3200
-cmd @ 25 fixmolcountincmpt DA 3200 vesicle_release
+cmd @ 110 translatecmpt jump 1 0 0 -850  
+cmd @ 180 translatecmpt jump 1 0 0 850
+
+cmd @ 220 translatecmpt jump 1 0 0 -850  
+cmd @ 250 translatecmpt jump 1 0 0 850
+
+#vesicle_release refil to 2800
+cmd @ 100 fixmolcountincmpt DA 2800 vesicle_release
+cmd @ 100 fixmolcountincmpt DA 100 cleft
+
+cmd @ 200 fixmolcountincmpt DA 2800 vesicle_release
+cmd @ 200 fixmolcountincmpt DA 100 cleft
  
 
-###Outputs
+### Outputs
 
 output_files output molcount_vesicle.csv molcount_cleft.csv
 output_format csv
-cmd i 0 60 2 molcountincmpt vesicle_release molcount_vesicle.csv
-cmd i 0 60 2 molcountincmpt cleft molcount_cleft.csv
+cmd i 0 500 10 molcountincmpt vesicle_release molcount_vesicle.csv
+cmd i 0 500 10 molcountincmpt cleft molcount_cleft.csv
 
 end_file
