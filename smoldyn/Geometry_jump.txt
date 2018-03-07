@@ -1,0 +1,243 @@
+#Smoldyn code for the geometry of the synapse
+#nm and usec
+
+########## Dimensions ##########
+dim 3
+boundaries 0 -1000 1000 r
+boundaries 1 -1000 1000 r
+boundaries 2 -1000 1000 r
+
+########## Species ########## 
+
+species DA AMPH COC D1  D1DA DAT DATDA DATCOC
+
+difc DA 240 #AV
+difc AMPH 300 #AV
+difc COC 192 #AV
+difc D1 0 
+difc D1DA 0 
+difc DAT 0 
+difc DATDA 0 
+difc DATCOC 0 
+
+
+color DA(all) green
+color AMPH(all) orange
+color D1(all) brown
+color D1DA(all) gold
+color DAT(all) cyan
+color DATDA(all) yellow
+color DATCOC(all) darkblue
+color COC(all) pink
+
+display_size all(all) 0.02
+display_size DA(all) 0.1
+display_size AMPH(all) 0.03
+display_size COC(all) 1
+display_size D1(all) 0.5
+display_size D1DA(all) 0.5
+display_size DAT(all) 0.5
+display_size DATDA(all) 0.5
+display_size DATCOC(all) 0.5
+
+########## Time steps ##########
+time_start 0
+time_stop 30000
+time_step 10
+
+########## Graphics ##########
+graphics opengl_good
+frame_thickness 0
+
+########## Surface ##########
+start_surface presynapse
+  action all both reflect
+  color both red 1
+  polygon both edge
+  panel disk 0 20 0 100 0 1 0 20
+  panel cyl 0 20 0 0 170 0 100 20 5
+  panel disk 0 170 0 100 0 1 0 20
+end_surface
+
+start_surface cleft
+  action all both reflect
+  color both purple 1
+  polygon both edge
+  #panel disk 0 0 0 100 0 -1 0 20
+  panel cyl 0 0 0 0 20 0 100 20 2
+  #panel disk 0 20 0 100 0 1 0 20
+end_surface
+
+start_surface cleftformols
+  action all both transmit
+  color both purple 1
+  polygon both edge
+  panel disk 0 1 0 100 0 -1 0 20
+  panel cyl 0 0 0 0 20 0 99 20 2
+  panel disk 0 19 0 100 0 1 0 20
+end_surface
+	
+
+start_surface postsynapse
+  action all both reflect
+  color both black
+  polygon both edge
+  panel disk 0 -170 0 100 0 -1 0 20
+  panel cyl 0 -170 0 0 0 0 100 20 5
+  panel disk 0 0 0 100 0 1 0 20
+end_surface
+
+start_surface vesicle_release
+  action all both reflect
+  color both green 1
+  polygon both edge
+  panel sph 0 50 0 25 10 10
+end_surface
+
+start_surface vesicle_uptake1
+  action DA front transmit
+  action DA back reflect
+  color both orange 1
+  polygon both edge
+  panel sph -60 75 0 25 10 10
+end_surface
+
+start_surface vesicle_uptake2
+  action DA front transmit
+  action DA back reflect
+  color both orange 1
+  polygon both edge
+  panel sph 60 75 0 25 10 10
+end_surface
+
+start_surface jump
+  panel disk 0 869 0 25 0 1 0 20 #disk 0 is the cleft one
+  panel disk 0 900 0 25 0 1 0 20 #disk 1 and below are in vesicle_release
+  panel disk 0 900 0 25 1 0 0 20 
+  panel disk 0 900 0 25 0 0 1 20 
+  panel disk 0 900 0 25 1 0 1 20 
+  panel disk 0 900 0 25 0 1 1 20
+  panel disk 0 900 00 25 1 1 0 20 
+  panel disk 0 900 0 25 1 1 1 20 
+  action both all j
+  jump disk1 front -> disk0 front
+  jump disk1 back -> disk0 front
+  jump disk2 front -> disk0 front
+  jump disk2 back -> disk0 front
+  jump disk3 front -> disk0 front
+  jump disk3 back -> disk0 front
+  jump disk4 front -> disk0 front
+  jump disk4 back -> disk0 front
+  jump disk5 front -> disk0 front
+  jump disk5 back -> disk0 front
+  jump disk6 front -> disk0 front
+  jump disk6 back -> disk0 front
+  jump disk7 front -> disk0 front
+  jump disk7 back -> disk0 front
+  thickness 1
+  color front lightyellow
+  color back orange
+end_surface
+
+########## Define compartments ##########
+
+start_compartment presynapse
+  surface presynapse
+  point 0 20 0
+end_compartment
+
+start_compartment vesicle_release
+  surface vesicle_release
+  point 0 50 0
+end_compartment
+
+start_compartment vesicle_uptake1
+  surface vesicle_uptake1
+  point -60 75 0
+end_compartment
+
+start_compartment vesicle_uptake2
+  surface vesicle_uptake2
+  point 60 75 0
+end_compartment
+
+start_compartment cleft
+  surface cleft
+  point 0 0 0
+end_compartment
+
+start_compartment cleftformols
+  surface cleftformols
+  point 0 1 0
+end_compartment
+
+start_compartment jump
+  surface jump
+  point 0 900 0
+end_compartment
+	
+########## Starting molecules/receptors ##########
+
+surface_mol 276 D1(back) postsynapse disk disk1 #AV
+surface_mol 1550 DAT(front) presynapse disk disk0 #AV
+
+
+compartment_mol 2500 DA vesicle_release #AV
+#compartment_mol 10 COC cleftformols
+
+########## Reactions ##########
+
+reaction D1fwd_k1 D1(back) + DA(all) -> D1DA(back) 1
+reaction D1bck_k-1 D1DA(back) -> D1(back) + DA(fsoln) 100
+
+reaction DATfwd_k1 DAT(front) + DA(all) -> DATDA(front) 1.7 #AV
+reaction DATfwd_k2 DATDA(front) -> DAT(front) + DA(fsoln) 1.4 #AV
+
+
+#reaction COCfwd DAT(front) + COC(all) -> DATCOC(front) 1
+#reaction COCbck DATCOC(front) -> DAT(front) + COC(bsoln) 0.02 #change so that Km for DA through DAT matches up
+
+########## Commands during sim ##########
+
+cmd b pause
+
+### DA release
+cmd @ 500 translatecmpt jump 1 0 -850 0
+cmd @ 600 translatecmpt jump 1 0 850 0
+
+cmd @ 10000 translatecmpt jump 1 0 -850 0
+cmd @ 10100 translatecmpt jump 1 0 850 0
+
+cmd @ 20000 translatecmpt jump 1 0 -850 0 
+cmd @ 20100 translatecmpt jump 1 0 850 0
+
+### vesicle_release refil to 2500
+cmd @ 9990 fixmolcountincmpt DA 2500 vesicle_release #AV
+#cmd @ 1000 fixmolcountincmpt DA 100 cleft
+
+cmd @ 19990 fixmolcountincmpt DA 2500 vesicle_release #AV
+#cmd @ 2000 fixmolcountincmpt DA 100 cleft
+ 
+
+########## Outputs ##########
+
+output_files output molcount_releasevesicle.csv molcount_cleft.csv molcount_presynapse.csv molcount_uptakevesicle1.csv molcount_uptakevesicle2.csv molcount.csv
+
+output_format csv
+
+cmd B molcountheader molcount.csv
+cmd B molcountheader molcount_presynapse.csv
+cmd B molcountheader molcount_releasevesicle.csv 
+cmd B molcountheader molcount_uptakevesicle1.csv 
+cmd B molcountheader molcount_uptakevesicle2.csv 
+cmd B molcountheader molcount_cleft.csv
+
+cmd i 0 30000 100 molcount molcount.csv 
+cmd i 0 30000 100 molcountincmpt presynapse molcount_presynapse.csv
+cmd i 0 30000 100 molcountincmpt vesicle_release molcount_releasevesicle.csv 
+cmd i 0 30000 100 molcountincmpt vesicle_uptake1 molcount_uptakevesicle1.csv 
+cmd i 0 30000 100 molcountincmpt vesicle_uptake2 molcount_uptakevesicle2.csv 
+cmd i 0 30000 100 molcountincmpt cleft molcount_cleft.csv
+
+
+end_file
