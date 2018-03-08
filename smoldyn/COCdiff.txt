@@ -1,0 +1,214 @@
+#Smoldyn code for the geometry of the synapse
+#nm and msec
+
+########## Dimensions ##########
+dim 3
+boundaries 0 -501 501 r
+boundaries 1 -501 501 r
+boundaries 2 -501 501 r
+
+########## Species ########## 
+
+species DA AMPH COC D1  D1DA DAT DATDA DATCOC
+
+difc DA 106700 #AV
+#difc AMPH 133000 #AV
+difc COC 85000 #AV
+difc D1 0 
+difc D1DA 0 
+difc DAT 0 
+difc DATDA 0 
+difc DATCOC 0 
+
+color DA(all) green
+color AMPH(all) orange
+color D1(all) brown
+color D1DA(all) gold
+color DAT(all) cyan
+color DATDA(all) yellow
+color DATCOC(all) darkblue
+color COC(all) pink
+
+display_size all(all) 0.02
+display_size DA(all) 0.5
+display_size AMPH(all) 0.03
+display_size COC(all) 0.5
+display_size D1(all) 0.5
+display_size D1DA(all) 0.5
+display_size DAT(all) 0.5
+display_size DATDA(all) 0.5
+display_size DATCOC(all) 0.5
+
+########## Time steps ##########
+time_start 0
+time_stop 100
+time_step 0.01
+
+########## Graphics ##########
+graphics opengl_good
+frame_thickness 0
+
+########## Surface ##########
+
+start_surface presynapse_part
+  action all both reflect
+  color both red
+  polygon both edge
+  panel hemi 0 0 20 250 0 0 -1 20 10
+  panel cyl 0 0 265 0 0 365 50 20 10
+  panel disk 0 0 265 50 0 0 1 20
+  panel disk 0 0 365 50 0 0 1 20
+end_surface
+
+start_surface postsynapse_part
+  action all both reflect
+  color both black
+  polygon both edge
+  panel hemi 0 0 0 250 0 0 1 20 10
+  panel cyl 0 0 -245 0 0 -350 50 20 10
+  panel disk 0 0 -245 50 0 0 1 20
+  panel disk 0 0 -350 50 0 0 1 20
+end_surface
+
+start_surface membranepre
+  action all both reflect
+  color both black
+  polygon both edge
+  panel disk 0 0 20 250 0 0 -1 20
+end_surface
+
+start_surface membranepost
+  action all both reflect
+  color both black
+  polygon both edge
+  panel disk 0 0 0 250 0 0 1 20
+end_surface
+
+start_surface brain
+  action all both reflect
+  color both blue
+  polygon both edge
+  panel rect +0 -400 -400 -400 800 800
+  panel rect +1 -400 -400 -400 800 800
+  panel rect +2 -400 -400 -400 800 800
+  panel rect +0 400 400 400 -800 -800
+  panel rect +1 400 400 400 -800 -800
+  panel rect +2 400 400 400 -800 -800
+end_surface
+
+start_surface cleftcyl
+  action all both transmit
+  polygon both edge
+  panel cyl 0 0 0 0 0 20 250 20 2
+end_surface
+
+########## Define compartments ##########
+
+start_compartment presynapse
+  surface presynapse_part
+  surface membranepre
+  point 0 0 50
+end_compartment
+
+start_compartment postsynapse
+  surface postsynapse_part
+  surface membranepost
+  point 0 0 -50
+end_compartment
+
+#start_compartment membranepre
+  #surface membranepre
+  #point 0 0 20
+#end_compartment
+
+#start_compartment membranepost
+  #surface membranepost
+  #point 0 0 0
+#end_compartment
+
+#start_compartment postsynapse
+  #compartment equal postsynapse_part
+  #compartment and membranepost
+  #point 0 0 -51
+#end_compartment
+
+#start_compartment presynapse
+  #compartment equal presynapse_part
+  #compartment and membranepre
+  #point 0 0 51
+#end_compartment
+
+start_compartment brain
+  surface brain
+  point 0 0 399
+end_compartment
+
+start_compartment cleft
+  surface cleftcyl
+  surface membranepre
+  surface membranepost
+  point 0 0 10
+end_compartment
+
+start_compartment extracellular
+  compartment equal brain
+  compartment andnot presynapse
+  compartment andnot postsynapse
+  compartment andnot cleft
+  point 0 399 0
+end_compartment
+
+#start_compartment cleft
+  #compartment equal cleftcyl
+  #compartment and membranepre
+  #compartment and membranepost
+  #point 0 0 10
+#end_compartment
+
+########## Starting molecules/receptors ##########
+
+#surface_mol 276 D1(back) postsynapse disk disk0 #AV
+surface_mol 3500 DAT(front) membranepre disk disk0 #AV
+
+
+#compartment_mol 2500 DA vesicle_release #AV
+compartment_mol 1000 COC extracellular
+
+########## Reactions ##########
+
+#reaction D1fwd_k1 D1(back) + DA(all) -> D1DA(back) 1
+#reaction D1bck_k-1 D1DA(back) -> D1(back) + DA(fsoln) 100
+
+#reaction DATfwd_k1 DAT(front) + DA(all) -> DATDA(front) 1.7 #AV
+#reaction DATfwd_k2 DATDA(front) -> DAT(front) + DA(fsoln) 1.4 #AV
+
+reaction COCfwd DAT(front) + COC(all) -> DATCOC(front) 1000
+reaction COCbck DATCOC(front) -> DAT(front) + COC(fsoln) 0.0002 #change so that Km for DA through DAT matches up
+
+########## Commands during sim ##########
+
+cmd b pause
+
+### DA release
+
+########## Outputs ##########
+
+output_files output COCmolcount_presynapse.csv COCmolcount_postsynapse.csv COCmolcount.csv COCmolcount_extracellular.csv COCmolcount_cleft.csv
+
+output_format csv
+
+cmd B molcountheader COCmolcount.csv
+cmd B molcountheader COCmolcount_presynapse.csv
+cmd B molcountheader COCmolcount_postsynapse.csv
+cmd B molcountheader COCmolcount_cleft.csv
+cmd B molcountheader COCmolcount_extracellular.csv
+
+
+cmd i 0 100 0.1 molcount COCmolcount.csv 
+cmd i 0 100 0.1 molcountincmpt presynapse COCmolcount_presynapse.csv
+cmd i 0 100 0.1 molcountincmpt postsynapse COCmolcount_postsynapse.csv
+cmd i 0 100 0.1 molcountincmpt cleft COCmolcount_cleft.csv
+cmd i 0 100 0.1 molcountincmpt extracellular COCmolcount_extracellular.csv
+
+
+end_file

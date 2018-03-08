@@ -1,0 +1,630 @@
+#Smoldyn code for the geometry of the synapse
+#nm and msec
+
+################################# Dimensions #################################
+dim 3
+boundaries 0 -501 501 r
+boundaries 1 -501 501 r
+boundaries 2 -501 1001 r
+
+################################# Species ################################# 
+
+species DA AMPH COC D1  D1DA DAT DATDA DATCOC
+
+difc DA 106700 #AV
+#difc AMPH 133000 #AV
+difc COC 85000 #AV
+difc D1 0 
+difc D1DA 0 
+difc DAT 0 
+difc DATDA 0 
+difc DATCOC 0 
+
+color DA(all) green
+color AMPH(all) orange
+color D1(all) brown
+color D1DA(all) gold
+color DAT(all) cyan
+color DATDA(all) yellow
+color DATCOC(all) darkblue
+color COC(all) pink
+
+display_size all(all) 0.02
+display_size DA(all) 0.5
+display_size AMPH(all) 0.03
+display_size COC(all) 0.5
+display_size D1(all) 0.5
+display_size D1DA(all) 0.5
+display_size DAT(all) 0.5
+display_size DATDA(all) 0.5
+display_size DATCOC(all) 0.5
+
+################################# Time steps #################################
+
+time_start 0
+time_stop 100
+time_step 0.01
+
+################################# Graphics #################################
+
+#graphics opengl_good
+#frame_thickness 0
+
+################################# Surfaces #################################
+
+start_surface presynapse_part
+  action all both reflect
+  color both red
+  polygon both edge
+  panel hemi 0 0 20 250 0 0 -1 20 10
+  panel cyl 0 0 265 0 0 365 50 20 10
+  panel disk 0 0 265 50 0 0 1 20
+  panel disk 0 0 365 50 0 0 1 20
+end_surface
+
+start_surface postsynapse_part
+  action all both reflect
+  color both black
+  polygon both edge
+  panel hemi 0 0 0 250 0 0 1 20 10
+  panel cyl 0 0 -245 0 0 -350 50 20 10
+  panel disk 0 0 -245 50 0 0 1 20
+  panel disk 0 0 -350 50 0 0 1 20
+end_surface
+
+start_surface membranepre
+  action all both reflect
+  color both black
+  polygon both edge
+  panel disk 0 0 20 250 0 0 -1 20
+end_surface
+
+start_surface membranepost
+  action all both reflect
+  color both black
+  polygon both edge
+  panel disk 0 0 0 250 0 0 1 20
+end_surface
+
+start_surface cleftcyl
+  action all both transmit
+  polygon both edge
+  color both white
+  panel cyl 0 0 0 0 0 20 250 20 2
+end_surface
+
+start_surface brain
+  action all both reflect
+  color both blue
+  polygon both edge
+  panel rect +0 -400 -400 -400 800 800
+  panel rect +1 -400 -400 -400 800 800
+  panel rect +2 -400 -400 -400 800 800
+  panel rect +0 400 400 400 -800 -800
+  panel rect +1 400 400 400 -800 -800
+  panel rect +2 400 400 400 -800 -800
+end_surface
+
+################################# Vesicles
+
+start_surface vesicle_release1
+  action all both reflect
+  color both green 1
+  polygon both edge
+  panel sph 0 140 55 25 10 10
+end_surface
+
+start_surface vesicle_release2
+  action all both reflect
+  color both green 1
+  polygon both edge
+  panel sph 133 43 55 25 10 10
+end_surface
+
+start_surface vesicle_release3
+  action all both reflect
+  color both green 1
+  polygon both edge
+  panel sph 82 -113 55 25 10 10
+end_surface
+
+start_surface vesicle_release4
+  action all both reflect
+  color both green 1
+  polygon both edge
+  panel sph -82 -113 55 25 10 10
+end_surface
+
+start_surface vesicle_release5
+  action all both reflect
+  color both green 1
+  polygon both edge
+  panel sph -133 43 55 25 10 10
+end_surface
+
+start_surface vesicle_releasecentre
+  action all both reflect
+  color both green 1
+  polygon both edge
+  panel sph 0 0 55 25 10 10
+end_surface
+
+start_surface vesicle_uptake1
+  action DA front transmit
+  action DA back reflect
+  color both orange 1
+  polygon both edge
+  panel sph 0 -140 80 25 10 10
+end_surface
+
+start_surface vesicle_uptake2
+  action DA front transmit
+  action DA back reflect
+  color both orange 1
+  polygon both edge
+  panel sph 133 -43 80 25 10 10
+end_surface
+
+start_surface vesicle_uptake3
+  action DA front transmit
+  action DA back reflect
+  color both orange 1
+  polygon both edge
+  panel sph 82 113 80 25 10 10
+end_surface
+
+start_surface vesicle_uptake4
+  action DA front transmit
+  action DA back reflect
+  color both orange 1
+  polygon both edge
+  panel sph -133 -43 80 25 10 10
+end_surface
+
+start_surface vesicle_uptake5
+  action DA front transmit
+  action DA back reflect
+  color both orange 1
+  polygon both edge
+  panel sph -82 113 80 25 10 10
+end_surface
+
+start_surface vesicle_uptakecentre
+  action DA front transmit
+  action DA back reflect
+  color both orange 1
+  polygon both edge
+  panel sph 0 0 115 25 10 10
+end_surface
+
+################################# Jumps
+
+start_surface jump_1
+  panel disk 0 140 869 25 0 0 1 20 #disk 0 is the cleft one
+  panel disk 0 140 905 25 0 1 0 20 #disk 1 and below are in vesicle_release
+  #panel disk 0 140 905 25 1 0 0 20 
+  #panel disk 0 140 905 25 0 0 1 20 
+  #panel disk 0 140 905 25 1 0 1 20 
+  #panel disk 0 140 905 25 0 1 1 20
+  #panel disk 0 140 905 25 1 1 0 20 
+  #panel disk 0 140 905 25 1 1 1 20 
+  action both all j
+  jump disk1 front -> disk0 front
+  jump disk1 back -> disk0 front
+  #jump disk2 front -> disk0 front
+  #jump disk2 back -> disk0 front
+  #jump disk3 front -> disk0 front
+  #jump disk3 back -> disk0 front
+  #jump disk4 front -> disk0 front
+  #jump disk4 back -> disk0 front
+  #jump disk5 front -> disk0 front
+  #jump disk5 back -> disk0 front
+  #jump disk6 front -> disk0 front
+  #jump disk6 back -> disk0 front
+  #jump disk7 front -> disk0 front
+  #jump disk7 back -> disk0 front
+  thickness 1
+  color front lightyellow
+end_surface
+
+start_surface jump_2
+  panel disk 113 43 869 25 0 0 1 20 #disk 0 is the cleft one
+  panel disk 113 43 905 25 0 1 0 20 #disk 1 and below are in vesicle_release
+  #panel disk 113 43 905 25 1 0 0 20 
+  #panel disk 113 43 905 25 0 0 1 20 
+  #panel disk 113 43 905 25 1 0 1 20 
+  #panel disk 113 43 905 25 0 1 1 20
+  #panel disk 113 43 905 25 1 1 0 20 
+  #panel disk 113 43 905 25 1 1 1 20 
+  action both all j
+  jump disk1 front -> disk0 front
+  jump disk1 back -> disk0 front
+  #jump disk2 front -> disk0 front
+  #jump disk2 back -> disk0 front
+  #jump disk3 front -> disk0 front
+  #jump disk3 back -> disk0 front
+  #jump disk4 front -> disk0 front
+  #jump disk4 back -> disk0 front
+  #jump disk5 front -> disk0 front
+  #jump disk5 back -> disk0 front
+  #jump disk6 front -> disk0 front
+  #jump disk6 back -> disk0 front
+  #jump disk7 front -> disk0 front
+  #jump disk7 back -> disk0 front
+  thickness 1
+  color front lightyellow
+end_surface
+
+start_surface jump_3
+  panel disk 82 -113 869 25 0 0 1 20 #disk 0 is the cleft one
+  panel disk 82 -113 905 25 0 1 0 20 #disk 1 and below are in vesicle_release
+  #panel disk 82 -113 905 25 1 0 0 20 
+  #panel disk 82 -113 905 25 0 0 1 20 
+  #panel disk 82 -113 905 25 1 0 1 20 
+  #panel disk 82 -113 905 25 0 1 1 20
+  #panel disk 82 -113 905 25 1 1 0 20 
+  #panel disk 82 -113 905 25 1 1 1 20 
+  action both all j
+  jump disk1 front -> disk0 front
+  jump disk1 back -> disk0 front
+  #jump disk2 front -> disk0 front
+  #jump disk2 back -> disk0 front
+  #jump disk3 front -> disk0 front
+  #jump disk3 back -> disk0 front
+  #jump disk4 front -> disk0 front
+  #jump disk4 back -> disk0 front
+  #jump disk5 front -> disk0 front
+  #jump disk5 back -> disk0 front
+  #jump disk6 front -> disk0 front
+  #jump disk6 back -> disk0 front
+  #jump disk7 front -> disk0 front
+  #jump disk7 back -> disk0 front
+  thickness 1
+  color front lightyellow
+end_surface
+
+start_surface jump_4
+  panel disk -82 -113 869 25 0 0 1 20 #disk 0 is the cleft one
+  panel disk -82 -113 905 25 0 1 0 20 #disk 1 and below are in vesicle_release
+  #panel disk -82 -113 905 25 1 0 0 20 
+  #panel disk -82 -113 905 25 0 0 1 20 
+  #panel disk -82 -113 905 25 1 0 1 20 
+  #panel disk -82 -113 905 25 0 1 1 20
+  #panel disk -82 -113 905 25 1 1 0 20 
+  #panel disk -82 -113 905 25 1 1 1 20 
+  action both all j
+  jump disk1 front -> disk0 front
+  jump disk1 back -> disk0 front
+  #jump disk2 front -> disk0 front
+  #jump disk2 back -> disk0 front
+  #jump disk3 front -> disk0 front
+  #jump disk3 back -> disk0 front
+  #jump disk4 front -> disk0 front
+  #jump disk4 back -> disk0 front
+  #jump disk5 front -> disk0 front
+  #jump disk5 back -> disk0 front
+  #jump disk6 front -> disk0 front
+  #jump disk6 back -> disk0 front
+  #jump disk7 front -> disk0 front
+  #jump disk7 back -> disk0 front
+  thickness 1
+  color front lightyellow
+end_surface
+
+start_surface jump_5
+  panel disk -133 43 869 25 0 0 1 20 #disk 0 is the cleft one
+  panel disk -133 43 905 25 0 1 0 20 #disk 1 and below are in vesicle_release
+  #panel disk -133 43 905 25 1 0 0 20 
+  #panel disk -133 43 905 25 0 0 1 20 
+  #panel disk -133 43 905 25 1 0 1 20 
+  #panel disk -133 43 905 25 0 1 1 20
+  #panel disk -133 43 905 25 1 1 0 20 
+  #panel disk -133 43 905 25 1 1 1 20 
+  action both all j
+  jump disk1 front -> disk0 front
+  jump disk1 back -> disk0 front
+  #jump disk2 front -> disk0 front
+  #jump disk2 back -> disk0 front
+  #jump disk3 front -> disk0 front
+  #jump disk3 back -> disk0 front
+  #jump disk4 front -> disk0 front
+  #jump disk4 back -> disk0 front
+  #jump disk5 front -> disk0 front
+  #jump disk5 back -> disk0 front
+  #jump disk6 front -> disk0 front
+  #jump disk6 back -> disk0 front
+  #jump disk7 front -> disk0 front
+  #jump disk7 back -> disk0 front
+  thickness 1
+  color front lightyellow
+end_surface
+
+start_surface jump_centre
+  panel disk 0 0 869 25 0 0 1 20 #disk 0 is the cleft one
+  panel disk 0 0 905 25 0 1 0 20 #disk 1 and below are in vesicle_release
+  #panel disk 0 0 905 25 1 0 0 20 
+  #panel disk 0 0 905 25 0 0 1 20 
+  #panel disk 0 0 905 25 1 0 1 20 
+  #panel disk 0 0 905 25 0 1 1 20
+  #panel disk 0 0 905 25 1 1 0 20 
+  #panel disk 0 0 905 25 1 1 1 20 
+  action both all j
+  jump disk1 front -> disk0 front
+  jump disk1 back -> disk0 front
+  #jump disk2 front -> disk0 front
+  #jump disk2 back -> disk0 front
+  #jump disk3 front -> disk0 front
+  #jump disk3 back -> disk0 front
+  #jump disk4 front -> disk0 front
+  #jump disk4 back -> disk0 front
+  #jump disk5 front -> disk0 front
+  #jump disk5 back -> disk0 front
+  #jump disk6 front -> disk0 front
+  #jump disk6 back -> disk0 front
+  #jump disk7 front -> disk0 front
+  #jump disk7 back -> disk0 front
+  thickness 1
+  color front lightyellow
+end_surface
+
+
+############################# Define compartments #############################
+
+start_compartment presynapse
+  surface presynapse_part
+  surface membranepre
+  point 0 0 50
+end_compartment
+
+start_compartment postsynapse
+  surface postsynapse_part
+  surface membranepost
+  point 0 0 -50
+end_compartment
+
+start_compartment brain
+  surface brain
+  point 0 0 399
+end_compartment
+
+start_compartment cleft
+  surface cleftcyl
+  surface membranepre
+  surface membranepost
+  point 0 0 10
+end_compartment
+
+start_compartment extracellular
+  compartment equal brain
+  compartment andnot presynapse
+  compartment andnot postsynapse
+  compartment andnot cleft
+  point 0 399 0
+end_compartment
+
+################################# Vesicles
+
+start_compartment vesicle_release1
+  surface vesicle_release1
+  point 0 140 55
+end_compartment
+
+start_compartment vesicle_release2
+  surface vesicle_release2
+  point 133 43 55
+end_compartment
+
+start_compartment vesicle_release3
+  surface vesicle_release3
+  point 82 -113 55
+end_compartment
+
+start_compartment vesicle_release4
+  surface vesicle_release4
+  point -82 -113 55
+end_compartment
+
+start_compartment vesicle_release5
+  surface vesicle_release5
+  point -133 43 55
+end_compartment
+
+start_compartment vesicle_releasecentre
+  surface vesicle_releasecentre
+  point 0 0 55
+end_compartment
+
+start_compartment vesicle_uptake1
+  surface vesicle_uptake1
+  point 0 -140 80
+end_compartment
+
+start_compartment vesicle_uptake2
+  surface vesicle_uptake2
+  point 133 -43 80
+end_compartment
+
+start_compartment vesicle_uptake3
+  surface vesicle_uptake3
+  point 82 113 80
+end_compartment
+
+start_compartment vesicle_uptake4
+  surface vesicle_uptake4
+  point -133 -43 80
+end_compartment
+
+start_compartment vesicle_uptake5
+  surface vesicle_uptake5
+  point -82 113 80
+end_compartment
+
+start_compartment vesicle_uptakecentre
+  surface vesicle_uptakecentre
+  point 0 0 115
+end_compartment
+
+
+################################# Jump Compartments
+
+start_compartment jump_1
+  surface jump_1
+  point 0 140 905
+end_compartment
+
+start_compartment jump_2
+  surface jump_2
+  point 113 43 905
+end_compartment
+
+start_compartment jump_3
+  surface jump_3
+  point 82 -113 905
+end_compartment
+
+start_compartment jump_4
+  surface jump_4
+  point -82 -113 905
+end_compartment
+
+start_compartment jump_5
+  surface jump_5
+  point -133 43 905
+end_compartment
+
+start_compartment jump_centre
+  surface jump_centre
+  point 0 0 905
+end_compartment
+
+######################## Starting molecules/receptors #######################
+
+#surface_mol 276 D1(back) postsynapse disk disk0 #AV
+surface_mol 3500 DAT(front) membranepre disk disk0 #AV
+
+
+#compartment_mol 2500 DA vesicle_release #AV
+compartment_mol 1000 COC extracellular
+
+################################# Reactions #################################
+
+#reaction D1fwd_k1 D1(back) + DA(all) -> D1DA(back) 1
+#reaction D1bck_k-1 D1DA(back) -> D1(back) + DA(fsoln) 100
+
+reaction DATfwd_k1_k-1 DAT(front) + DA(all) -> DATDA(front) 18 #AV
+reaction DATfwd_k2 DATDA(front) -> DAT(front) + DA(fsoln) 0.0306 #AV
+
+reaction COCfwd DAT(front) + COC(all) -> DATCOC(front) 1000
+reaction COCbck DATCOC(front) -> DAT(front) + COC(fsoln) 0.0002 #change so that Km for DA through DAT matches up
+
+############################# Commands during sim ############################
+
+cmd b pause
+
+### DA release and refill
+
+cmd @ 5 translatecmpt jump_1 1 0 0 -850 
+cmd @ 5 translatecmpt jump_2 1 0 0 -850
+cmd @ 5 translatecmpt jump_3 1 0 0 -850
+cmd @ 5 translatecmpt jump_4 1 0 0 -850
+cmd @ 5 translatecmpt jump_5 1 0 0 -850
+cmd @ 5 translatecmpt jump_centre 1 0 0 -850
+
+cmd @ 6 translatecmpt jump_1 1 0 0 850
+cmd @ 6 translatecmpt jump_2 1 0 0 850
+cmd @ 6 translatecmpt jump_3 1 0 0 850
+cmd @ 6 translatecmpt jump_4 1 0 0 850
+cmd @ 6 translatecmpt jump_5 1 0 0 850
+cmd @ 6 translatecmpt jump_centre 1 0 0 850
+
+cmd @ 9 fixmolcountincmpt DA 2500 vesicle_release1 #AV
+cmd @ 9 fixmolcountincmpt DA 2500 vesicle_release2 #AV
+cmd @ 9 fixmolcountincmpt DA 2500 vesicle_release3 #AV
+cmd @ 9 fixmolcountincmpt DA 2500 vesicle_release4 #AV
+cmd @ 9 fixmolcountincmpt DA 2500 vesicle_release5 #AV
+cmd @ 9 fixmolcountincmpt DA 2500 vesicle_releasecentre #AV
+
+cmd @ 35 translatecmpt jump_1 1 0 0 -850
+cmd @ 35 translatecmpt jump_2 1 0 0 -850
+cmd @ 35 translatecmpt jump_3 1 0 0 -850
+cmd @ 35 translatecmpt jump_4 1 0 0 -850
+cmd @ 35 translatecmpt jump_5 1 0 0 -850
+cmd @ 35 translatecmpt jump_centre 1 0 0 -850
+
+cmd @ 36 translatecmpt jump_1 1 0 0 850
+cmd @ 36 translatecmpt jump_2 1 0 0 850
+cmd @ 36 translatecmpt jump_3 1 0 0 850
+cmd @ 36 translatecmpt jump_4 1 0 0 850
+cmd @ 36 translatecmpt jump_5 1 0 0 850
+cmd @ 36 translatecmpt jump_centre 1 0 0 850
+
+cmd @ 62 fixmolcountincmpt DA 2500 vesicle_release1 #AV
+cmd @ 62 fixmolcountincmpt DA 2500 vesicle_release2 #AV
+cmd @ 62 fixmolcountincmpt DA 2500 vesicle_release3 #AV
+cmd @ 62 fixmolcountincmpt DA 2500 vesicle_release4 #AV
+cmd @ 62 fixmolcountincmpt DA 2500 vesicle_release5 #AV
+cmd @ 62 fixmolcountincmpt DA 2500 vesicle_releasecentre #AV
+
+cmd @ 65 translatecmpt jump_1 1 0 0 -850
+cmd @ 65 translatecmpt jump_2 1 0 0 -850
+cmd @ 65 translatecmpt jump_3 1 0 0 -850
+cmd @ 65 translatecmpt jump_4 1 0 0 -850
+cmd @ 65 translatecmpt jump_5 1 0 0 -850
+cmd @ 65 translatecmpt jump_centre 1 0 0 -850
+
+cmd @ 66 translatecmpt jump_1 1 0 0 850
+cmd @ 66 translatecmpt jump_2 1 0 0 850
+cmd @ 66 translatecmpt jump_3 1 0 0 850
+cmd @ 66 translatecmpt jump_4 1 0 0 850
+cmd @ 66 translatecmpt jump_5 1 0 0 850
+cmd @ 66 translatecmpt jump_centre 1 0 0 850
+
+################################# Outputs #################################
+
+output_files output molcount_presynapse.csv molcount_postsynapse.csv molcount.csv molcount_extracellular.csv molcount_cleft.csv
+
+output_files output molcount_rvesicle1.csv molcount_rvesicle2.csv molcount_rvesicle3.csv molcount_rvesicle4.csv molcount_rvesicle5.csv molcount_rvesiclecentre.csv 
+
+output_files output molcount_uvesicle1.csv molcount_uvesicle2.csv molcount_uvesicle3.csv molcount_uvesicle4.csv molcount_uvesicle5.csv molcount_uvesiclecentre.csv
+
+output_format csv
+
+cmd B molcountheader molcount.csv
+cmd B molcountheader molcount_presynapse.csv
+cmd B molcountheader molcount_postsynapse.csv
+cmd B molcountheader molcount_cleft.csv
+cmd B molcountheader molcount_extracellular.csv
+cmd B molcountheader molcount_rvesicle1.csv 
+cmd B molcountheader molcount_rvesicle2.csv
+cmd B molcountheader molcount_rvesicle3.csv
+cmd B molcountheader molcount_rvesicle4.csv
+cmd B molcountheader molcount_rvesicle5.csv
+cmd B molcountheader molcount_rvesiclecentre.csv
+cmd B molcountheader molcount_uvesicle1.csv 
+cmd B molcountheader molcount_uvesicle2.csv
+cmd B molcountheader molcount_uvesicle3.csv
+cmd B molcountheader molcount_uvesicle4.csv
+cmd B molcountheader molcount_uvesicle5.csv
+cmd B molcountheader molcount_uvesiclecentre.csv
+
+cmd i 0 100 0.1 molcount molcount.csv 
+cmd i 0 100 0.1 molcountincmpt presynapse molcount_presynapse.csv
+cmd i 0 100 0.1 molcountincmpt postsynapse molcount_postsynapse.csv
+cmd i 0 100 0.1 molcountincmpt cleft molcount_cleft.csv
+cmd i 0 100 0.1 molcountincmpt extracellular molcount_extracellular.csv
+cmd i 0 100 0.1 molcountincmpt vesicle_release1 molcount_rvesicle1.csv
+cmd i 0 100 0.1 molcountincmpt vesicle_release2 molcount_rvesicle2.csv
+cmd i 0 100 0.1 molcountincmpt vesicle_release3 molcount_rvesicle3.csv
+cmd i 0 100 0.1 molcountincmpt vesicle_release4 molcount_rvesicle4.csv
+cmd i 0 100 0.1 molcountincmpt vesicle_release5 molcount_rvesicle5.csv
+cmd i 0 100 0.1 molcountincmpt vesicle_releasecentre molcount_rvesiclecentre.csv
+cmd i 0 100 0.1 molcountincmpt vesicle_uptake1 molcount_uvesicle1.csv
+cmd i 0 100 0.1 molcountincmpt vesicle_uptake2 molcount_uvesicle2.csv
+cmd i 0 100 0.1 molcountincmpt vesicle_uptake3 molcount_uvesicle3.csv
+cmd i 0 100 0.1 molcountincmpt vesicle_uptake4 molcount_uvesicle4.csv
+cmd i 0 100 0.1 molcountincmpt vesicle_uptake5 molcount_uvesicle5.csv
+cmd i 0 100 0.1 molcountincmpt vesicle_uptakecentre molcount_uvesiclecentre.csv
+
+
+
+end_file
