@@ -1,0 +1,219 @@
+#Smoldyn code for the geometry of the synapse
+#nm and msec
+
+########## Dimensions ##########
+dim 3
+boundaries 0 -500 500 r
+boundaries 1 -500 1000 r
+boundaries 2 -500 500 r
+
+########## Species ########## 
+
+species DA D1  D1DA DAT DATDA DATI
+
+difc DA 68000 #AV
+difc D1 0 
+difc D1DA 0 
+difc DAT 0 
+difc DATDA 0 
+difc DATI 0
+
+color DA(all) green
+color D1(all) brown
+color D1DA(all) gold
+color DAT(all) cyan
+color DATDA(all) yellow
+color DATI(all) black
+
+display_size all 0.2
+display_size DA(all) 0.5
+display_size D1(all) 0.5
+display_size D1DA(all) 0.5
+display_size DAT(all) 0.5
+display_size DATDA(all) 0.5
+display_size DAT(all) 0.5
+
+########## Time steps ##########
+time_start 0
+time_stop 250
+time_step 0.01
+
+########## Graphics ##########
+#graphics opengl_good
+#frame_thickness 0
+
+########## Surface ##########
+start_surface presynapse_part
+  action all both reflect
+  color both red 1
+  polygon both edge
+  panel cyl 0 20 0 0 170 0 204 20 5
+  panel disk 0 170 0 204 0 1 0 20
+end_surface
+
+start_surface postsynapse_part
+  action all both reflect
+  color both black
+  polygon both edge
+  panel disk 0 -170 0 204 0 -1 0 20
+  panel cyl 0 -170 0 0 0 0 204 20 5
+end_surface
+
+start_surface cleftcyl
+  action all both reflect
+  color both purple 1
+  polygon both edge
+  panel cyl 0 0 0 0 20 0 204 20 2
+end_surface
+
+start_surface membranepre
+  action all both reflect
+  color both black
+  polygon both edge
+  panel disk 0 20 0 204 0 1 0 20
+end_surface
+
+start_surface membranepost
+  action all both reflect
+  color both black
+  polygon both edge
+  panel disk 0 0 0 204 0 1 0 20
+end_surface
+
+start_surface vesicle_release
+  action all both reflect
+  color both green 1
+  polygon both edge
+  panel sph 0 50 0 25 10 10
+end_surface
+
+#start_surface vesicle_uptake1
+  #action DA front transmit
+  #action DA back reflect
+  #color both orange 1
+  #polygon both edge
+  #panel sph 0 105 0 25 10 10
+#end_surface
+
+#start_surface brian
+  #action all both reflect
+  #color both orchid
+  #polygon both edge
+  #panel sph 0 0 0 300 10 10
+#end_surface
+
+start_surface jump
+  panel disk 0 869 0 25 0 1 0 20 #disk 0 is the cleft one
+  panel disk 0 900 0 25 0 1 0 20 #disk 1 and below are in vesicle_release
+  panel disk 0 900 0 25 1 0 0 20 
+  action both all j
+  jump disk1 front -> disk0 front
+  jump disk1 back -> disk0 front
+  jump disk2 front -> disk0 front
+  jump disk2 back -> disk0 front
+  thickness 1
+  color front lightyellow
+  color back orange
+end_surface
+
+########## Define compartments ##########
+
+start_compartment presynapse
+  surface presynapse_part
+  surface membranepre
+  point 0 22 0
+end_compartment
+
+start_compartment postsynapse
+  surface postsynapse_part
+  surface membranepost
+  point 0 -1 0
+end_compartment
+
+start_compartment cleft
+  surface cleftcyl
+  surface membranepre
+  surface membranepost
+  point 0 1 0
+end_compartment
+
+start_compartment jump
+  surface jump
+  point 0 900 0
+end_compartment
+
+start_compartment vesicle_release
+  surface vesicle_release
+  point 0 50 0
+end_compartment
+
+#start_compartment vesicle_uptake1
+  #surface vesicle_uptake1
+  #point 0 105 0
+#end_compartment
+
+#start_compartment brain
+ #surface brian
+  #point 0 0 299
+#end_compartment
+
+########## Starting molecules/receptors ##########
+
+surface_mol 276 D1(back) membranepost disk disk0 #AV
+surface_mol 1194 DAT(front) membranepre disk disk0 #AV
+surface_mol 356 DATI(front) membranepre disk disk0 #AV
+
+#compartment_mol 2500 DA vesicle_release #AV
+
+########## Reactions ##########
+
+reaction D1fwd_k1 D1(back) + DA(all) -> D1DA(back) 10000
+reaction D1bck_k-1 D1DA(back) ->  D1(back) + DA(fsoln) 1000000
+
+reaction DATfwd_k1 DAT(front) + DA(all) -> DATDA(front) 2210 #AV
+reaction DATfwd_k2 DATDA(front) -> DAT(front) + DA(fsoln) 0.0071 #AV
+
+reaction_cmpt cleft DAdecay DA(fsoln) -> 0 1.306
+reaction_cmpt cleft DAsynth 0 -> DA(fsoln) 0.00002
+
+########## Commands during sim ##########
+
+cmd b pause
+
+### DA release
+
+cmd i 0 250 0.1 fixmolcountincmpt AMPH 40 cleft 
+
+cmd @ 49 fixmolcountincmpt DA 2500 vesicle_release #AV
+cmd @ 50 translatecmpt jump 1 0 -850 0
+cmd @ 51 translatecmpt jump 1 0 850 0
+
+cmd @ 99 fixmolcountincmpt DA 2500 vesicle_release #AV
+cmd @ 100 translatecmpt jump 1 0 -850 0
+cmd @ 101 translatecmpt jump 1 0 850 0
+
+cmd @ 149 fixmolcountincmpt DA 2500 vesicle_release #AV
+cmd @ 150 translatecmpt jump 1 0 -850 0
+cmd @ 151 translatecmpt jump 1 0 850 0
+
+cmd @ 199 fixmolcountincmpt DA 2500 vesicle_release #AV
+cmd @ 200 translatecmpt jump 1 0 -850 0
+cmd @ 201 translatecmpt jump 1 0 850 0
+
+########## Outputs ##########
+
+output_files output_CCAD molcount_releasevesicle_CCAD.csv molcount_cleft_CCAD.csv molcount_presynapse_CCAD.csv molcount_CCAD.csv
+
+output_format csv
+
+cmd B molcountheader molcount_CCAD.csv
+cmd B molcountheader molcount_presynapse_CCAD.csv
+cmd B molcountheader molcount_releasevesicle_CCAD.csv  
+cmd B molcountheader molcount_cleft_CCAD.csv
+
+cmd i 0 250 0.1 molcount molcount_CCAD.csv 
+cmd i 0 250 0.1 molcountincmpt presynapse molcount_presynapse_CCAD.csv
+cmd i 0 250 0.1 molcountincmpt vesicle_release molcount_releasevesicle_CCAD.csv 
+cmd i 0 250 0.1 molcountincmpt cleft molcount_cleft_CCAD.csv
+
+end_file
