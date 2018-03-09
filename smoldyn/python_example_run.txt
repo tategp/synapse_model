@@ -1,0 +1,200 @@
+#Smoldyn code for the geometry of the synapse
+#nm and msec
+
+#Incase the values are undefined
+ifundefine X
+	define X 1
+	define SIMNUM 1
+endif
+
+ 
+########## Dimensions ##########
+dim 3
+boundaries 0 -200 200 r
+boundaries 1 -200 200 r
+boundaries 2 -200 200 r
+
+########## Species ########## (DAO=DAextrasynaptic, DAI=DAintrabouton)
+
+species DA AMPH D1 DAT D1DA DATDA
+
+difc DA 107000 #AV
+difc AMPH 3
+difc D1 0 #AV
+difc D1DA 0 #AV
+difc DAT 0 #AV
+difc DATDA 0 #AV
+
+color DA(all) green
+color AMPH(all) orange
+color D1(all) rose
+color D1DA(all) gold
+color DAT(all) cyan
+color DATDA(all) yellow
+
+
+display_size all(all) 0.02
+display_size DA(all) 0.1
+display_size AMPH(all) 0.03
+display_size D1(all) 0.5
+display_size D1DA(all) 0.5
+display_size DAT(all) 0.5
+display_size DATDA(all) 0.5
+
+
+########## Time steps ##########
+time_start 0
+time_stop 100
+time_step 0.01
+
+########## Graphics ##########
+graphics opengl_good
+frame_thickness 0
+
+########## Surface ##########
+start_surface presynapse
+  action all both reflect
+  color both red 1
+  polygon both edge
+  panel disk 0 20 0 100 0 -1 0 20
+  panel cyl 0 20 0 0 170 0 100 20 5
+  panel disk 0 170 0 100 0 1 0 20
+end_surface
+
+start_surface cleft
+  action all both reflect
+  color both purple 1
+  polygon both edge
+  panel disk 0 0 0 100 0 -1 0 20
+  panel cyl 0 0 0 0 20 0 100 20 2
+  panel disk 0 20 0 100 0 1 0 20
+end_surface
+
+start_surface postsynapse
+  action all both reflect
+  color both black
+  polygon both edge
+  panel disk 0 -170 0 100 0 -1 0 20
+  panel cyl 0 -170 0 0 0 0 100 20 5
+  panel disk 0 0 0 100 0 1 0 20
+end_surface
+
+start_surface vesicle_release
+  action all both reflect
+  color both green 1
+  polygon both edge
+  panel sph 0 50 0 25 10 10
+end_surface
+
+start_surface vesicle_uptake1
+  action DA front transmit
+  action DA back reflect
+  color both orange 1
+  polygon both edge
+  panel sph -60 75 0 25 10 10
+end_surface
+
+start_surface vesicle_uptake2
+  action DA front transmit
+  action DA back reflect
+  color both orange 1
+  polygon both edge
+  panel sph 60 75 0 25 10 10
+end_surface
+
+start_surface jump
+  panel disk 0 869 0 25 0 1 0 20 #disk 0 is the cleft one
+  panel disk 0 900 0 25 0 1 0 20 #disk 1 and below are in vesicle_release
+  panel disk 0 900 0 25 1 0 0 20 
+  panel disk 0 900 0 25 0 0 1 20 
+  panel disk 0 900 0 25 1 0 1 20 
+  panel disk 0 900 0 25 0 1 1 20
+  panel disk 0 900 00 25 1 1 0 20 
+  panel disk 0 900 0 25 1 1 1 20 
+  action both all j
+  jump disk1 front -> disk0 front
+  jump disk1 back -> disk0 front
+  jump disk2 front -> disk0 front
+  jump disk2 back -> disk0 front
+  jump disk3 front -> disk0 front
+  jump disk3 back -> disk0 front
+  jump disk4 front -> disk0 front
+  jump disk4 back -> disk0 front
+  jump disk5 front -> disk0 front
+  jump disk5 back -> disk0 front
+  jump disk6 front -> disk0 front
+  jump disk6 back -> disk0 front
+  jump disk7 front -> disk0 front
+  jump disk7 back -> disk0 front
+  thickness 1
+  color front lightyellow
+  color back orange
+end_surface
+
+########## Define compartments ##########
+
+start_compartment presynapse
+  surface presynapse
+  point 0 20 0
+end_compartment
+
+start_compartment vesicle_release
+  surface vesicle_release
+  point 0 50 0
+end_compartment
+
+start_compartment vesicle_uptake1
+  surface vesicle_release
+  point -60 75 0
+end_compartment
+
+start_compartment vesicle_uptake2
+  surface vesicle_release
+  point 60 75 0
+end_compartment
+
+start_compartment cleft
+  surface cleft
+  point 0 0 0
+end_compartment
+
+start_compartment jump
+  surface jump
+  point 0 900 0
+end_compartment
+	
+########## Starting molecules/receptors ##########
+
+surface_mol 276 D1(back) cleft disk disk0 #AV
+surface_mol 1550 DAT(front) cleft disk disk1 #AV
+
+compartment_mol 2500 DA vesicle_release
+
+########## Reactions ##########
+
+reaction D1fwd D1(back) + DA(all) -> D1DA(back) 1
+reaction D1bck D1DA(back) -> D1(back) + DA(fsoln) 100
+reaction DATfwd DAT(front) + DA(all) <-> DATDA(front) 3655 542 #k1, x0.1 for cocaine
+reaction DATbck DATDA(front) -> DAT(front) + DA(fsoln) 0.0306  #k2
+
+########## Commands during sim ##########
+
+### DA release
+cmd @ 5 translatecmpt jump 1 0 -850 0
+cmd @ 6 translatecmpt jump 1 0 850 0
+
+
+
+#cmd b pause
+
+########## Outputs ##########
+
+output_files molcount_uptakevesicle1_SIMNUMout.csv 
+
+output_format csv
+
+cmd B molcountheader molcount_uptakevesicle1_SIMNUMout.csv 
+
+cmd i 0 300 10 molcountincmpt vesicle_uptake1 molcount_uptakevesicle1_SIMNUMout.csv 
+
+end_file

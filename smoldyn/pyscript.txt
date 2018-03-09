@@ -1,0 +1,9 @@
+# A python script for scanning a parameter
+import os
+
+simnum=0
+for x in [1,2,3,4,5,6,7,8,9,10]:
+	simnum+=1
+	string='smoldyn DA_release+reuptake.txt --define X=%f --define SIMNUM=%i -tqw' %(x,simnum)
+	print (string)
+	os.system(string)
