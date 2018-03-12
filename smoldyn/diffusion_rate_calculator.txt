@@ -1,0 +1,560 @@
+#Smoldyn code for the geometry of the synapse
+#nm and msec
+
+################################# Dimensions #################################
+dim 3
+boundaries 0 -1681 1681 r
+boundaries 1 -1681 1681 r
+boundaries 2 -1681 1681 r
+
+################################# Species ################################# 
+
+species DA AMPH COC D1  D1DA DAT DATDA DATCOC
+
+difc DA 68000 #AV
+#difc AMPH 85000 #AV
+difc COC 54400 #AV
+difc D1 0 
+difc D1DA 0 
+difc DAT 0 
+difc DATDA 0 
+difc DATCOC 0 
+
+color DA(all) green
+color AMPH(all) orange
+color D1(all) brown
+color D1DA(all) gold
+color DAT(all) cyan
+color DATDA(all) yellow
+color DATCOC(all) darkblue
+color COC(all) pink
+
+display_size all(all) 0.02
+display_size DA(all) 0.5
+display_size AMPH(all) 0.03
+display_size COC(all) 0.5
+display_size D1(all) 0.5
+display_size D1DA(all) 0.5
+display_size DAT(all) 0.5
+display_size DATDA(all) 0.5
+display_size DATCOC(all) 0.5
+
+################################# Time steps #################################
+
+time_start 0
+time_stop 100
+time_step 0.01
+
+################################# Graphics #################################
+
+#graphics opengl_good
+#frame_thickness 0
+
+################################# Surfaces #################################
+
+start_surface presynapse_part
+  action all both reflect
+  color both red
+  polygon both edge
+  panel hemi 0 0 20 500 0 0 -1 20 10
+  panel cyl 0 0 450 0 0 1515 200 20 10
+  panel disk 0 0 450 200 0 0 1 20
+  panel disk 0 0 1515 200 0 0 1 20
+end_surface
+
+start_surface postsynapse_part
+  action all both reflect
+  color both black
+  polygon both edge
+  panel hemi 0 0 0 500 0 0 1 20 10
+  panel cyl 0 0 -445 0 0 -1495 200 20 10
+  panel disk 0 0 -445 200 0 0 1 20
+  panel disk 0 0 -1495 200 0 0 1 20
+end_surface
+
+start_surface membranepre
+  action all both reflect
+  color both black
+  polygon both edge
+  panel disk 0 0 20 500 0 0 -1 20
+end_surface
+
+start_surface membranepost
+  action all both reflect
+  color both black
+  polygon both edge
+  panel disk 0 0 0 500 0 0 1 20
+end_surface
+
+start_surface cleftcyl
+  action all both transmit
+  polygon both edge
+  color both white
+  panel cyl 0 0 0 0 0 20 500 20 2
+end_surface
+
+start_surface brain
+  action all both reflect
+  color both blue
+  polygon both edge
+  panel cyl 0 0 1515 0 0 -1495 1500 20 10 
+  panel disk 0 0 1515 1500 0 0 1 20
+  panel disk 0 0 -1495 1500 0 0 1 20
+end_surface
+
+################################# Vesicles
+
+start_surface vesicle_release1
+  action all both reflect
+  color both green 1
+  polygon both edge
+  panel sph 0 270 55 25 10 10
+end_surface
+
+start_surface vesicle_release2
+  action all both reflect
+  color both green 1
+  polygon both edge
+  panel sph 257 83 55 25 10 10
+end_surface
+
+start_surface vesicle_release3
+  action all both reflect
+  color both green 1
+  polygon both edge
+  panel sph 159 -218 55 25 10 10
+end_surface
+
+start_surface vesicle_release4
+  action all both reflect
+  color both green 1
+  polygon both edge
+  panel sph -159 -218 55 25 10 10
+end_surface
+
+start_surface vesicle_release5
+  action all both reflect
+  color both green 1
+  polygon both edge
+  panel sph -257 83 55 25 10 10
+end_surface
+
+start_surface vesicle_releasecentre
+  action all both reflect
+  color both green 1
+  polygon both edge
+  panel sph 0 0 55 25 10 10
+end_surface
+
+start_surface vesicle_uptake1
+  action DA front transmit
+  action DA back reflect
+  color both orange 1
+  polygon both edge
+  panel sph 0 -270 80 25 10 10
+end_surface
+
+start_surface vesicle_uptake2
+  action DA front transmit
+  action DA back reflect
+  color both orange 1
+  polygon both edge
+  panel sph -257 -83 80 25 10 10
+end_surface
+
+start_surface vesicle_uptake3
+  action DA front transmit
+  action DA back reflect
+  color both orange 1
+  polygon both edge
+  panel sph -159 218 80 25 10 10
+end_surface
+
+start_surface vesicle_uptake4
+  action DA front transmit
+  action DA back reflect
+  color both orange 1
+  polygon both edge
+  panel sph 159 218 80 25 10 10
+end_surface
+
+start_surface vesicle_uptake5
+  action DA front transmit
+  action DA back reflect
+  color both orange 1
+  polygon both edge
+  panel sph 257 -83 80 25 10 10
+end_surface
+
+start_surface vesicle_uptakecentre
+  action DA front transmit
+  action DA back reflect
+  color both orange 1
+  polygon both edge
+  panel sph 0 0 115 25 10 10
+end_surface
+
+################################# Jumps
+
+start_surface jump_1
+  panel disk 0 270 869 25 0 0 1 20 #disk 0 is the cleft one
+  panel disk 0 270 905 25 0 1 0 20 #disk 1 and below are in vesicle_release
+  #panel disk 0 140 905 25 1 0 0 20 
+  #panel disk 0 140 905 25 0 0 1 20 
+  #panel disk 0 140 905 25 1 0 1 20 
+  #panel disk 0 140 905 25 0 1 1 20
+  #panel disk 0 140 905 25 1 1 0 20 
+  #panel disk 0 140 905 25 1 1 1 20 
+  action both all j
+  jump disk1 front -> disk0 front
+  jump disk1 back -> disk0 front
+  #jump disk2 front -> disk0 front
+  #jump disk2 back -> disk0 front
+  #jump disk3 front -> disk0 front
+  #jump disk3 back -> disk0 front
+  #jump disk4 front -> disk0 front
+  #jump disk4 back -> disk0 front
+  #jump disk5 front -> disk0 front
+  #jump disk5 back -> disk0 front
+  #jump disk6 front -> disk0 front
+  #jump disk6 back -> disk0 front
+  #jump disk7 front -> disk0 front
+  #jump disk7 back -> disk0 front
+  thickness 1
+  color front lightyellow
+end_surface
+
+start_surface jump_2
+  panel disk 257 83 869 25 0 0 1 20 #disk 0 is the cleft one
+  panel disk 257 83 905 25 0 1 0 20 #disk 1 and below are in vesicle_release
+  #panel disk 113 43 905 25 1 0 0 20 
+  #panel disk 113 43 905 25 0 0 1 20 
+  #panel disk 113 43 905 25 1 0 1 20 
+  #panel disk 113 43 905 25 0 1 1 20
+  #panel disk 113 43 905 25 1 1 0 20 
+  #panel disk 113 43 905 25 1 1 1 20 
+  action both all j
+  jump disk1 front -> disk0 front
+  jump disk1 back -> disk0 front
+  #jump disk2 front -> disk0 front
+  #jump disk2 back -> disk0 front
+  #jump disk3 front -> disk0 front
+  #jump disk3 back -> disk0 front
+  #jump disk4 front -> disk0 front
+  #jump disk4 back -> disk0 front
+  #jump disk5 front -> disk0 front
+  #jump disk5 back -> disk0 front
+  #jump disk6 front -> disk0 front
+  #jump disk6 back -> disk0 front
+  #jump disk7 front -> disk0 front
+  #jump disk7 back -> disk0 front
+  thickness 1
+  color front lightyellow
+end_surface
+
+start_surface jump_3
+  panel disk 159 -218 869 25 0 0 1 20 #disk 0 is the cleft one
+  panel disk 159 -218 905 25 0 1 0 20 #disk 1 and below are in vesicle_release
+  #panel disk 82 -113 905 25 1 0 0 20 
+  #panel disk 82 -113 905 25 0 0 1 20 
+  #panel disk 82 -113 905 25 1 0 1 20 
+  #panel disk 82 -113 905 25 0 1 1 20
+  #panel disk 82 -113 905 25 1 1 0 20 
+  #panel disk 82 -113 905 25 1 1 1 20 
+  action both all j
+  jump disk1 front -> disk0 front
+  jump disk1 back -> disk0 front
+  #jump disk2 front -> disk0 front
+  #jump disk2 back -> disk0 front
+  #jump disk3 front -> disk0 front
+  #jump disk3 back -> disk0 front
+  #jump disk4 front -> disk0 front
+  #jump disk4 back -> disk0 front
+  #jump disk5 front -> disk0 front
+  #jump disk5 back -> disk0 front
+  #jump disk6 front -> disk0 front
+  #jump disk6 back -> disk0 front
+  #jump disk7 front -> disk0 front
+  #jump disk7 back -> disk0 front
+  thickness 1
+  color front lightyellow
+end_surface
+
+start_surface jump_4
+  panel disk -159 -218 869 25 0 0 1 20 #disk 0 is the cleft one
+  panel disk -159 -218 905 25 0 1 0 20 #disk 1 and below are in vesicle_release
+  #panel disk -82 -113 905 25 1 0 0 20 
+  #panel disk -82 -113 905 25 0 0 1 20 
+  #panel disk -82 -113 905 25 1 0 1 20 
+  #panel disk -82 -113 905 25 0 1 1 20
+  #panel disk -82 -113 905 25 1 1 0 20 
+  #panel disk -82 -113 905 25 1 1 1 20 
+  action both all j
+  jump disk1 front -> disk0 front
+  jump disk1 back -> disk0 front
+  #jump disk2 front -> disk0 front
+  #jump disk2 back -> disk0 front
+  #jump disk3 front -> disk0 front
+  #jump disk3 back -> disk0 front
+  #jump disk4 front -> disk0 front
+  #jump disk4 back -> disk0 front
+  #jump disk5 front -> disk0 front
+  #jump disk5 back -> disk0 front
+  #jump disk6 front -> disk0 front
+  #jump disk6 back -> disk0 front
+  #jump disk7 front -> disk0 front
+  #jump disk7 back -> disk0 front
+  thickness 1
+  color front lightyellow
+end_surface
+
+start_surface jump_5
+  panel disk -257 83 869 25 0 0 1 20 #disk 0 is the cleft one
+  panel disk -257 83 905 25 0 1 0 20 #disk 1 and below are in vesicle_release
+  #panel disk -133 43 905 25 1 0 0 20 
+  #panel disk -133 43 905 25 0 0 1 20 
+  #panel disk -133 43 905 25 1 0 1 20 
+  #panel disk -133 43 905 25 0 1 1 20
+  #panel disk -133 43 905 25 1 1 0 20 
+  #panel disk -133 43 905 25 1 1 1 20 
+  action both all j
+  jump disk1 front -> disk0 front
+  jump disk1 back -> disk0 front
+  #jump disk2 front -> disk0 front
+  #jump disk2 back -> disk0 front
+  #jump disk3 front -> disk0 front
+  #jump disk3 back -> disk0 front
+  #jump disk4 front -> disk0 front
+  #jump disk4 back -> disk0 front
+  #jump disk5 front -> disk0 front
+  #jump disk5 back -> disk0 front
+  #jump disk6 front -> disk0 front
+  #jump disk6 back -> disk0 front
+  #jump disk7 front -> disk0 front
+  #jump disk7 back -> disk0 front
+  thickness 1
+  color front lightyellow
+end_surface
+
+start_surface jump_centre
+  panel disk 0 0 869 25 0 0 1 20 #disk 0 is the cleft one
+  panel disk 0 0 905 25 0 1 0 20 #disk 1 and below are in vesicle_release
+  #panel disk 0 0 905 25 1 0 0 20 
+  #panel disk 0 0 905 25 0 0 1 20 
+  #panel disk 0 0 905 25 1 0 1 20 
+  #panel disk 0 0 905 25 0 1 1 20
+  #panel disk 0 0 905 25 1 1 0 20 
+  #panel disk 0 0 905 25 1 1 1 20 
+  action both all j
+  jump disk1 front -> disk0 front
+  jump disk1 back -> disk0 front
+  #jump disk2 front -> disk0 front
+  #jump disk2 back -> disk0 front
+  #jump disk3 front -> disk0 front
+  #jump disk3 back -> disk0 front
+  #jump disk4 front -> disk0 front
+  #jump disk4 back -> disk0 front
+  #jump disk5 front -> disk0 front
+  #jump disk5 back -> disk0 front
+  #jump disk6 front -> disk0 front
+  #jump disk6 back -> disk0 front
+  #jump disk7 front -> disk0 front
+  #jump disk7 back -> disk0 front
+  thickness 1
+  color front lightyellow
+end_surface
+
+
+############################# Define compartments #############################
+
+start_compartment presynapse
+  surface presynapse_part
+  surface membranepre
+  point 0 0 50
+end_compartment
+
+start_compartment postsynapse
+  surface postsynapse_part
+  surface membranepost
+  point 0 0 -50
+end_compartment
+
+start_compartment brain
+  surface brain
+  point 0 0 599
+end_compartment
+
+start_compartment cleft
+  surface cleftcyl
+  surface membranepre
+  surface membranepost
+  point 0 0 10
+end_compartment
+
+start_compartment extracellular
+  compartment equal brain
+  compartment andnot presynapse
+  compartment andnot postsynapse
+  compartment andnot cleft
+  point 0 599 0
+end_compartment
+
+################################# Vesicles
+
+start_compartment vesicle_release1
+  surface vesicle_release1
+  point 0 269 55
+end_compartment
+
+start_compartment vesicle_release2
+  surface vesicle_release2
+  point 257 83 55
+end_compartment
+
+start_compartment vesicle_release3
+  surface vesicle_release3
+  point 159 -218 55
+end_compartment
+
+start_compartment vesicle_release4
+  surface vesicle_release4
+  point -159 -218 55
+end_compartment
+
+start_compartment vesicle_release5
+  surface vesicle_release5
+  point -257 83 55
+end_compartment
+
+start_compartment vesicle_releasecentre
+  surface vesicle_releasecentre
+  point 0 0 55
+end_compartment
+
+start_compartment vesicle_uptake1
+  surface vesicle_uptake1
+  point 0 -270 80
+end_compartment
+
+start_compartment vesicle_uptake2
+  surface vesicle_uptake2
+  point -257 -83 80
+end_compartment
+
+start_compartment vesicle_uptake3
+  surface vesicle_uptake3
+  point -159 218 80
+end_compartment
+
+start_compartment vesicle_uptake4
+  surface vesicle_uptake4
+  point 159 218 80
+end_compartment
+
+start_compartment vesicle_uptake5
+  surface vesicle_uptake5
+  point 257 -83 80
+end_compartment
+
+start_compartment vesicle_uptakecentre
+  surface vesicle_uptakecentre
+  point 0 0 115
+end_compartment
+
+
+################################# Jump Compartments
+
+start_compartment jump_1
+  surface jump_1
+  point 0 270 905
+end_compartment
+
+start_compartment jump_2
+  surface jump_2
+  point 257 83 905
+end_compartment
+
+start_compartment jump_3
+  surface jump_3
+  point 159 -218 905
+end_compartment
+
+start_compartment jump_4
+  surface jump_4
+  point -159 -218 905
+end_compartment
+
+start_compartment jump_5
+  surface jump_5
+  point -257 83 905
+end_compartment
+
+start_compartment jump_centre
+  surface jump_centre
+  point 0 0 905
+end_compartment
+
+######################## Starting molecules/receptors #######################
+
+#surface_mol 276 D1(back) postsynapse disk disk0 #AV
+#surface_mol 9300 DAT(front) membranepre disk disk0 #AV
+
+
+compartment_mol 2500 DA vesicle_release1 #AV
+compartment_mol 2500 DA vesicle_release2 #AV
+compartment_mol 2500 DA vesicle_release3 #AV
+compartment_mol 2500 DA vesicle_release4 #AV
+compartment_mol 2500 DA vesicle_release5 #AV
+compartment_mol 2500 DA vesicle_releasecentre #AV
+
+#compartment_mol 5000 COC extracellular
+
+################################# Reactions #################################
+
+#reaction D1fwd_k1 D1(back) + DA(all) -> D1DA(back) 1
+#reaction D1bck_k-1 D1DA(back) -> D1(back) + DA(fsoln) 100
+
+reaction DATfwd_k1_k-1 DAT(front) + DA(all) -> DATDA(front) 2210
+reaction DATfwd_k2 DATDA(front) -> DAT(front) + DA(fsoln) 0.0071 
+
+#reaction COCfwd DAT(front) + COC(all) -> DATCOC(front) 1000
+#reaction COCbck DATCOC(front) -> DAT(front) + COC(fsoln) 0.0002 #change so that Km for DA through DAT matches up
+
+############################# Commands during sim ############################
+
+#cmd b pause
+
+### DA release and refill
+
+cmd @ 0 translatecmpt jump_1 1 0 0 -850 
+cmd @ 0 translatecmpt jump_2 1 0 0 -850
+cmd @ 0 translatecmpt jump_3 1 0 0 -850
+cmd @ 0 translatecmpt jump_4 1 0 0 -850
+cmd @ 0 translatecmpt jump_5 1 0 0 -850
+cmd @ 0 translatecmpt jump_centre 1 0 0 -850
+
+
+
+################################# Outputs #################################
+
+output_files output molcount_presynapse.csv molcount_postsynapse.csv molcount.csv molcount_extracellular.csv molcount_cleft.csv
+
+output_format csv
+
+cmd B molcountheader molcount.csv
+cmd B molcountheader molcount_presynapse.csv
+cmd B molcountheader molcount_postsynapse.csv
+cmd B molcountheader molcount_cleft.csv
+cmd B molcountheader molcount_extracellular.csv
+
+
+cmd i 0 100 0.1 molcount molcount.csv 
+cmd i 0 100 0.1 molcountincmpt presynapse molcount_presynapse.csv
+cmd i 0 100 0.1 molcountincmpt postsynapse molcount_postsynapse.csv
+cmd i 0 100 0.1 molcountincmpt cleft molcount_cleft.csv
+cmd i 0 100 0.1 molcountincmpt extracellular molcount_extracellular.csv
+
+
+
+
+end_file
